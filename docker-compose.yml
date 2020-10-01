@@ -1,14 +1,32 @@
-version: '2'
+version: '3'
 
 services:
   db:
-    image: postgres
+    image: postgres:alpine
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: db
+      POSTGRES_PASSWORD: db
+      POSTGRES_DB: dj-docker
+    networks:
+      - custom-network
+
   web:
     build: .
-    command: python3 manage.py runserver 0.0.0.0:8000
-    volumes:
-      - .:/code
+    command: python manage.py runserver 0.0.0.0:8000
+    # volumes:
+    #   - .:/code
     ports:
-      - "8000:8000"
+      - 8000:8000
     depends_on:
       - db
+    networks:
+      - custom-network
+
+volumes:
+  database-data:
+
+networks:
+    custom-network:
+        driver: bridge
